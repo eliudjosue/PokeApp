@@ -9,7 +9,10 @@ function App() {
   const store = generateStore()
   return (
     <Provider store = {store}>
-      <Pokemones/>
+      <div className="container m-3">
+        <Pokemones/>
+      </div>
+      
     </Provider>
     
     

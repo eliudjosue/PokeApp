@@ -34,18 +34,19 @@ const Pokemones = () => {
                 className="btn btn-dark">Get Pokemones</button>
                 }
 
-                {
-                    next && 
-                    <button 
-                    onClick={() => dispatch(siguientePokemonAction())}
-                    className="btn btn-dark">Siguiente</button>
-                }
                 
                 {
                     previous &&
                     <button 
                     onClick={() => dispatch(anteriorPokemonAction())}
                     className="btn btn-dark">Anterior</button>
+                }
+
+                {
+                    next && 
+                    <button 
+                    onClick={() => dispatch(siguientePokemonAction())}
+                    className="btn btn-dark">Siguiente</button>
                 }
             </div>
             

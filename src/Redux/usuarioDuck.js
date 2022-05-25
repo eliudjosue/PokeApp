@@ -1,4 +1,4 @@
-import {auth, firebase} from '../firebase'
+import {auth, db, firebase} from '../firebase'
 //data inical
 const dataInicial={
     loading:false,
@@ -20,7 +20,7 @@ export default function usuarioReducer (state= dataInicial, action){
         case USUARIO_ERROR:
             return{...dataInicial}
         case USUARIO_EXITO:
-            return{...state, loading:false, user:action.payload, activo:true }
+            return{...state, loading: false, user: action.payload, activo: true }
         case CERRAR_SESION:
             return {...dataInicial}    
         default:
@@ -38,19 +38,38 @@ export const ingresoUsuarioAccion = () => async(dispatch) => {
         
         const provider = new firebase.auth.GoogleAuthProvider();
         const res = await auth.signInWithPopup(provider);
-        dispatch({
-            type:USUARIO_EXITO,
-            payload: {
-                uid: res.user.uid,
-                email: res.user.email
-            }
-        })
+        
+        console.log(res.user)
 
-        localStorage.setItem('usuario', JSON.stringify({
+        const usuario = {
             uid: res.user.uid,
-            email: res.user.email
-        }))
+            email: res.user.email,
+            displayName: res.user.displayName,
+            photoURL: res.user.photoURL
+        }
 
+        const usuarioDB = await db.collection('usuarioos').doc(usuario.email).get()
+        console.log(usuarioDB)
+
+        if (usuarioDB.exists) {
+            //cuando existe el usuario en firestore
+            dispatch({
+                type:USUARIO_EXITO,
+                payload: usuarioDB.data()
+            })
+    
+            localStorage.setItem('usuario', JSON.stringify(usuarioDB.data()))
+        } else {
+            //cuando NO existe el usuario en firestore
+            await db.collection('usuarioos').doc(usuario.email).set(usuario)
+            dispatch({
+                type:USUARIO_EXITO,
+                payload: usuario
+            })
+    
+            localStorage.setItem('usuario', JSON.stringify(usuario))
+        }
+        
     } catch (error) {
         console.log(error)
         dispatch({
@@ -76,4 +95,33 @@ export const cerrarSesionAccion = () => (dispatch) =>{
     dispatch({
         type: CERRAR_SESION
     })
+}
+
+export const actualizarUsuarioAccion = (nombreActualizado) => async(dispatch, getState) => {
+    dispatch({
+        type: LOADING
+    })
+
+    const {user} = getState().usuario
+
+    try {
+
+        await db.collection('usuarioos').doc(user.email).update({
+            displayName: nombreActualizado
+        })
+
+        const usuario = {
+            ...user,
+            displayName: nombreActualizado
+        }
+
+        dispatch({
+            type:USUARIO_EXITO,
+            payload: usuario
+        })
+
+        localStorage.setItem('ususario', JSON.stringify(usuario))
+    } catch (error) {
+        console.log(error)
+    }
 }

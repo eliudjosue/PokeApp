@@ -8,19 +8,20 @@ const Login = (props) => {
   const loading = useSelector(store => store.usuario.loading)
   const activo = useSelector(store => store.usuario.activo)
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     console.log(activo)
     if(activo){
       props.history.push('./')
     }
-  },[activo])
+  },[activo, props.history])
   return (
     <div className='mt-5 text-center'>
         <h1>Ingreso con Google</h1>
         <hr/>
         <button 
         className="btn btn-dark"
-        onClick={()=>dispatch(ingresoUsuarioAccion())}>Acceder</button>
+        onClick={()=>dispatch(ingresoUsuarioAccion())}
+        disabled={loading}>Acceder</button>
     </div>
   )
 }

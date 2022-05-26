@@ -1,4 +1,4 @@
-import {auth, db, firebase} from '../firebase'
+import {auth, db, firebase, storage} from '../firebase'
 //data inical
 const dataInicial={
     loading:false,
@@ -39,7 +39,7 @@ export const ingresoUsuarioAccion = () => async(dispatch) => {
         const provider = new firebase.auth.GoogleAuthProvider();
         const res = await auth.signInWithPopup(provider);
         
-        console.log(res.user)
+        // console.log(res.user)
 
         const usuario = {
             uid: res.user.uid,
@@ -49,7 +49,7 @@ export const ingresoUsuarioAccion = () => async(dispatch) => {
         }
 
         const usuarioDB = await db.collection('usuarioos').doc(usuario.email).get()
-        console.log(usuarioDB)
+        // console.log(usuarioDB)
 
         if (usuarioDB.exists) {
             //cuando existe el usuario en firestore
@@ -121,6 +121,41 @@ export const actualizarUsuarioAccion = (nombreActualizado) => async(dispatch, ge
         })
 
         localStorage.setItem('ususario', JSON.stringify(usuario))
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const editarFotoAccion = (imagenEditada) => async(dispatch, getState) =>{
+
+    dispatch({
+        type: LOADING
+    })
+
+    const {user} = getState().usuario
+
+    try {
+        
+        const imagenRef = await storage.ref().child(user.email).child('foto perfil')
+        await imagenRef.put(imagenEditada)
+        const imagenURL = await imagenRef.getDownloadURL()
+
+        await db.collection('usuarioos').doc(user.email).update({
+            photoURL:imagenURL
+        })
+
+        const usuario = {
+            ...user,
+            photoURL: imagenURL
+        }
+
+        dispatch({
+            type: USUARIO_EXITO,
+            payload: usuario
+        }) 
+
+        localStorage.setItem('usuario', JSON.stringify(usuario))
+
     } catch (error) {
         console.log(error)
     }

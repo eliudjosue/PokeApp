@@ -15,7 +15,7 @@ function App() {
     const fethData = () =>{
 
       auth.onAuthStateChanged(user => {
-      console.log(user)
+      // console.log(user)
       if(user){
         setFirebaseUser(user)
       }else{
@@ -58,8 +58,8 @@ function App() {
     </Router>
       
   ): (<div className='text-center'>
-    <div class="spinner-border text-dark" role="status">
-      <span class="visually-hidden">Loading...</span>
+    <div className="spinner-border text-dark" role="status">
+      <span className="visually-hidden">Loading...</span>
     </div>
   </div>)
 }

@@ -11,6 +11,8 @@ const dataInicial = {
 const OBTENER_POKEMONES_EXITO = 'OBTENER_POKEMONES_EXITO'
 const SIGUIENTE_POKEMONES_EXITO = 'SIGUIENTE_POKEMONES_EXITO'
 const POKE_INFO_EXITO = 'POKE_INFO_EXITO'
+
+
 // reducer
 export default function pokeReducer(state = dataInicial, action){
     switch(action.type){
@@ -24,8 +26,10 @@ export default function pokeReducer(state = dataInicial, action){
                 return state
     }
 }
+
+
 // acciones
-export const obtenerPokemonesAccion = () =>async (dispatch, getState) => {
+export const obtenerPokemonesAccion = () =>async (dispatch) => {
 
     if(localStorage.getItem('offset=0')){
         dispatch({

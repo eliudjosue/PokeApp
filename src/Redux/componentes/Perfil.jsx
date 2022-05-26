@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { actualizarUsuarioAccion } from '../usuarioDuck'
+import { actualizarUsuarioAccion, editarFotoAccion } from '../usuarioDuck'
 
 const Perfil = () => {
     const usuario = useSelector(store => store.usuario.user)
@@ -9,33 +9,80 @@ const Perfil = () => {
 
     const [activarFormulario, setActivarFormulario] = React.useState(false);
     const [nombreUsuario, setNombreUsuario] = React.useState(usuario.displayName)
+    const [error, setError] = React.useState(false)
 
     const actualizarUsuario = () => {
         if(!nombreUsuario.trim()){
-            console.log('vacio')
+            // console.log('vacio')
             return
         }
         dispatch(actualizarUsuarioAccion(nombreUsuario))
         setActivarFormulario(false)
     }
+
+    const seleccionarArchivo = imagen => {
+        // console.log(imagen.target.files[0])
+        const imagenUsuario = imagen.target.files[0]
+
+          if(imagenUsuario === undefined){
+            // console.log('No se selecciono la imagen')
+            return
+        }
+
+        if(imagenUsuario.type === "image/png" || imagenUsuario.type === "image/jpeg"){
+            dispatch(editarFotoAccion(imagenUsuario))
+        
+            setError(false)
+        }else{
+            setError(true)
+        }
+        
+    }
+
+
   return (
     <div className='mt-5 text-center'>
         <div className="card-body">
-            <img src={usuario.photoURL} alt="" className="fluid" />
+            <img src={usuario.photoURL} alt="" style={{width:'150px'}} className="img-fluid rounded img-thumbnail" />
             <h5 className="card-title">{usuario.displayName}</h5>
             <p className="card-text">{usuario.email}</p>
+            
             <button 
             className="btn btn-dark"
             onClick={()=> setActivarFormulario(true)}>
                 Editar Nombre
             </button>
 
-            {
-                loading && <div className="card-body">
-                    <div class="spinner-border text-dark" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                {
+                    error && 
+                    <div className="alert alert-warning mt-3">
+                        Solo se permiten archivos png o jpg
                     </div>
-                </div>
+                }
+
+            <div className="custom-file mt-3">
+                <input 
+                    type="file" 
+                    className="custom-file-input"
+                    id="inputGroupFile01"
+                    style={{display:'none'}} 
+                    onChange = {e => seleccionarArchivo(e)}
+                    disabled={loading}
+                />
+                <label 
+                    className={loading ? "btn btn-dark disabled" : "btn btn-dark" }
+                    htmlFor="inputGroupFile01"
+                >
+                    Actualizar Imagen
+                </label>
+            </div>
+
+            {
+                loading && (<div className="card-body">
+                                <div className="spinner-border text-dark" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                            </div>)
             }
                 {
                     activarFormulario && (
